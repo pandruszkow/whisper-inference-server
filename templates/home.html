@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- This is a simple HTML + JavaScript page demonstrating how the API works -->
+	<title>Whisper Inference Server - WAV upload</title>
+	<script>
+		function transcribeFile() {
+			var fileInput = document.getElementById("fileInput");
+			var file = fileInput.files[0];
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === 4) {
+					if (xhr.status === 200) {
+						var result = JSON.parse(xhr.responseText);
+						var transcription = result.transcription;
+						var transcriptionText = "";
+						for (var i = 0; i < transcription.segments.length; i++) {
+							transcriptionText += transcription.segments[i].text + "<br>";
+						}
+						document.getElementById("transcriptionOutput").innerHTML = transcriptionText;
+					} else {
+						alert("Error: " + xhr.statusText);
+					}
+				}
+			}
+			xhr.open("POST", "/recognise", true);
+			var formData = new FormData();
+			formData.append("file", file);
+			xhr.send(formData);
+		}
+	</script>
+</head>
+<body>
+	<h1>Welcome to the Whisper Inference Server!</h1>
+	<p>Use the form below to upload a WAV file and get its transcription:</p>
+	<form method="POST" action="/recognise" enctype="multipart/form-data">
+		<input type="file" name="file" id="fileInput"><br><br>
+		<input type="button" value="Submit" onclick="transcribeFile()">
+	</form>
+	<p>Transcription:</p>
+	<div id="transcriptionOutput"></div>
+	<p>To use this from your application, here are some cURL command examples:</p>
+	<pre>curl -X POST -F "file=@/path/to/audio/file" http://localhost:5000/recognise</pre>
+	<pre>curl -X POST -H "Content-Type: application/json" -d '{"model_name": "large-v2"}' http://localhost:5000/reload</pre>
+</body>
+</html>
