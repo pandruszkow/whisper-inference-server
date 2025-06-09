@@ -1,5 +1,5 @@
 # whisper-inference-server
-An inference server for Whisper so you don't have to keep waiting for the audio model to reload for the x-hunderdth time.
+An inference server for Whisper
 
 ## Installation
 
